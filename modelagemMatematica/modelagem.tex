@@ -1,0 +1,70 @@
+\documentclass[a4paper]{article}
+\usepackage[brazilian]{babel}
+\usepackage{subfig}
+\usepackage{booktabs}
+\usepackage{graphicx}
+%-----------------------------------------------------------------
+\title{MS438 - Programa\c{c}\~ao Linear.}
+\author{122830 Alcides Goldoni Junior\\
+  \small Modelagem matem\'{a}tica \\
+  %\small Unicamp 
+}%Fechando Title
+\begin{document}
+\maketitle
+%Seções
+%-----------------------------------------------------------------
+\section{Modelagem - Exemplos}
+\subsection{O problema: F\'abrica de m\'oveis}
+Uma f\'abrica tem em estoque 250m de t\'abuas, 600m de prancha e 500m de pain\'eis conglomerados. A f\'abrica oferece uma linha de m\'oveis composta de escrivaninha, mesa de reuni\~ao, arm\'ario e prateleiras. Cada tipo de m\'ovel é constru\'ido com uma certa quantidade de mat\'eria-prima, que \'e dado na tabela. O valor de venda de cada unidade de cada produto tamb\'em é dado na tabela.
+\\
+Escreva um modelo que maximize a receita com a venda dos m\'oveis.
+\\
+\begin{table}[]
+\centering
+\caption{Materiais da empresa}
+\label{my-label}
+\begin{tabular}{c|c|c|c|c|c}
+\cline{2-5}
+& \multicolumn{4}{c|}{Quantidade de material (m)} & \\ 
+\cline{2-6} 
+& Escriv.    & Mesa    & Arm\'ario   & Prateleira   & \multicolumn{1}{c|}{Dispon\'ivel} \\ 
+\hline
+\multicolumn{1}{|c|}{T\'abua}   & 1          & 1       & 1         & 4            & \multicolumn{1}{c|}{250}        \\ \hline
+\multicolumn{1}{|c|}{Prancha} & 0          & 1       & 1         & 2            & \multicolumn{1}{c|}{600}        \\ \hline
+\multicolumn{1}{|c|}{Painel}  & 3          & 2       & 4         & 0            & \multicolumn{1}{c|}{500}        \\ \hline
+\multicolumn{1}{|c|}{Valor}   & 100        & 80      & 120       & 20           &                                 \\ \cline{1-5}
+\end{tabular}
+\end{table}
+\\
+\subsection{A solu\c{c}\~ao}
+\begin{itemize}
+\item Defini\c{c}\~oes
+Vamos definir que $x_i$ \'e a quantidade de moveis produzida;
+\\
+$x_1$ = Escrivaninhas
+\\
+$x_2$ = Mesas 
+\\
+$x_3$ = Arm\'arios
+\\
+$x_4$ = Prateleiras
+\\
+\item Fun\c{c}\~ao Objetivo
+\\
+Nosso problema quer maximizar os lucros da empresa, portanto:
+\\
+\begin{equation}
+max f(x_1,x_2,x_3,x_4) = 100x_1 + 80x_2 +120 x_3 + 20 x_4
+\end{equation}
+\item Restri\c{c}\~oes
+\\
+$f(x_1,x_2,x_3,x_3) = 
+\left \{
+\begin{array}{ll}
+x_1 + x_2 + x_3 +4x_4 \leq 250 \\ 
+0x_1 + x_2 + x_3 +1x_4  \leq 600\\ 
+3x_1 + 2x_2 + 4x_3 +0x_4  \leq 500\\ 
+x_1,x_2,x_3, x_4 \geq 0
+\end{array}
+\end{itemize}
+\end{document}
