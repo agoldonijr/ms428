@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 //Definicao das matrizes Basica
-int *defineB(int m, int n, int **A){
+int **defineB(int m, int n, int **A){
 	int **basica;
 	int i;
 	int j;
@@ -20,13 +20,13 @@ int *defineB(int m, int n, int **A){
 }
 
 //Definicao das matrizes Nao-Basica
-int *defineNaoB(int m, int n, int **A){
+int **defineNaoB(int m, int n, int **A){
 	int **Naobasica;
 	int i;
 	int j;
 
 	//Alocando a matriz B
-	Naobasica = (int*)malloc(n *sizeof (int));
+	Naobasica = (int*)malloc(m *sizeof (int));
 	for (i=0; i<m; i++)
 		Naobasica[i] = (int) calloc(0, (n-m)*sizeof(int));
 
@@ -82,17 +82,17 @@ int main(){
 		A[i] = preencheVetor(n);
 	}
 	//preenchendo a matriz basica
-	B = defineB(n,m,A);
+	B = defineB(m,n,A);
 	//preenchendo a matriz nao basica
-	N = defineNaoB(n,m,A);
+	N = defineNaoB(m,n,A);
 
 	for (i=0; i<m; i++){
-		for (j=0; j<n; j++)
+		for (j=0; j<m; j++)
 			printf("%d ", B[i][j]);
 		printf("\n");
 	}
 	for (i=0; i<m; i++){
-		for (j=0; j<n; j++)
+		for (j=0; j<n-m; j++)
 			printf("%d ", N[i][j]);
 		printf("\n");
 	}
