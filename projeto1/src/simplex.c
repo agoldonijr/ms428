@@ -1,8 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
+#include <stdbool.h>
 
 //multiplicacao de matriz por vetor
-int **multiplicaMatrix(int **M, int **N, int){
+int **multiplicaMatrix(int **matriz, int *vetor, int tam){
+	int i;
+	int j;
+	int *mult;
+
+	mult = (int) calloc(0, sizeof(int));
+	puts("validar");
+	for (i=0; i<tam; i++)
+		for (j=0; j<tam; j++)
+			mult = matriz[i][j] * vetor[i];
 	return mult;
 }
 
@@ -12,31 +23,34 @@ int *resolveSistema(int tam, int **matriz, int *vetor){
 	return xb;
 }
 
-//resolve lambda
-int *resolveLambda(int *custo, int **B){
-
-	return lambda;
-}
-
 //calcula custo relativo
-int *custosRelativo(int *custo, int *lambda, int **N){
-
-	return custos;
-}
-
-//teste de otimalidade
-int testeOtimalidade(int *custos, int tam){
+int entraNaBase(int *custoNB, int *lambda, int **N, int m, int n){
 	int i;
-
-	for(i=0; i< tam; i++)
-		if(custos[i] < 0)
-			return 0;
+	int j;
+	int indiceMin = 0;
+	int valMin = INT_MAX;
+	
+	for (i=0; i<n-m; i++){
+		int aux =0;
+		for (j=0; j<m; j++)
+			aux += lambda[i] *N[j][i];
+		if (valMin > custoNB[i]-aux){
+			valMin = custoNB[i]-aux;
+			indiceMin = i;
+		}
+	}
+	if(valMin > 0)
+		return -1;
+	else
+		return indiceMin;
 }
-//Definicao das matrizes Basica
-int **defineB(int m, int n, int **A){
+
+//Definicao das matrizes Basica e do custo das matrizes basicas
+int **defineB(int m, int n, int **A, int **custoB, int *custo){
 	int **basica;
 	int i;
 	int j;
+
 
 	//Alocando a matriz B
 	basica = (int*)malloc(m *sizeof (int));
@@ -45,20 +59,13 @@ int **defineB(int m, int n, int **A){
 	for (i=0; i<m; i++)
 		for (j=0; j<m; j++) {
 			basica[i][j] = A[i][n-m+j];
+			(*custoB)[j] = custo[n-m+j]; 
 		}
 
 	return basica;
 }
-//Define Cb
-int *custoBasico(int *custos){
-
-}
-//Define Cn
-int *custoNaoBasico(int *custos){
-	
-}
 //Definicao das matrizes Nao-Basica
-int **defineNaoB(int m, int n, int **A){
+int **defineNaoB(int m, int n, int **A, int **custoNB, int *custo){
 	int **Naobasica;
 	int i;
 	int j;
@@ -69,8 +76,10 @@ int **defineNaoB(int m, int n, int **A){
 		Naobasica[i] = (int) calloc(0, (n-m)*sizeof(int));
 
 	for (i=0; i<m; i++)
-		for (j=0; j<n-m; j++)
+		for (j=0; j<n-m; j++){
 			Naobasica[i][j] = A[i][j];
+			(*custoNB)[j] = custo[j];
+		}
 
 	return Naobasica;
 }
@@ -121,22 +130,25 @@ int main(){
 	A = (int**)malloc(n * sizeof(int));
 	printf("Digite a matriz de coeficientes de restricao.\n");
 	for (i=0; i<m; i++){
-		printf("Linha %d", i+1);
+		printf("Linha %d\n", i+1);
 		A[i] = preencheVetor(n);
 	}
-	//preenchendo a matriz basica e nao basica
-	B = defineB(m,n,A);
-	N = defineNaoB(m,n,A);
-	
 	//preenche o vetor custoBasico e custoNaoBasico
-	cn = custoNaoBasico();
-	cb = custoBasico();
+	cb = (int)calloc (0, m*sizeof(int));
+	cn = (int)calloc (0, (n-m)*sizeof(int));
+	//preenchendo a matriz basica e nao basica
+	B = defineB(m,n,A,&cb,c);
+	N = defineNaoB(m,n,A,&cn,c);
+	
 
 	while(true){
+		int indEntraBase;
 		//calcula Xb
 		xb = resolveSistema(m,B,b);
 		lambda = resolveSistema(m,B,c);
-		cRelativo = custosRelativo()
+		indEntraBase = entraNaBase(cn, lambda, N, m, n);
+		if (indEntraBase == -1)
+			break;
 		break;
 	}
 
