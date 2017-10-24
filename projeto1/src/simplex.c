@@ -19,6 +19,31 @@ int **alocaMatriz(int lin, int col) {
 	return matriz;
 }
 
+// Essa funcao le os valores de um vetor da entrada padrao
+int *lerVetor(int tam){
+	int *vet = alocaVetor(tam);
+
+	for (int i=0; i<tam; i++) {
+		scanf("%d", &vet[i]);
+	}
+
+	return vet;
+}
+
+int **lerMatriz(int lin, int col) {
+	int** matriz = alocaMatriz(lin, col);
+
+	for (int i=0; i < lin; i++) {
+		printf("Digite a linha %d:\n", i+1);
+
+		for (int j=0; j < col; j++) {
+			scanf("%d", &matriz[i][j]);
+		}
+	}
+
+	return matriz;
+}
+
 ///////
 
 
@@ -28,16 +53,18 @@ int pegaIndiceEntraNaBase(int *custoNB, int *lambda, int **N, int m, int n) {
 	int indiceMin = 0;
 	int valMin = INT_MAX;
 	
-	for (int i=0; i<n-m; i++) {
+	//para cada coluna
+	for (int j=0; j<n-m; j++) {
 		int aux =0;
 
-		for (int j=0; j<m; j++) {
-			aux += lambda[i] *N[j][i];
+		//calcula o custo relativo
+		for (int i=0; i<m; i++) {
+			aux += lambda[j] *N[i][j];
 		}
 
-		if (valMin > custoNB[i]-aux) {
-			valMin = custoNB[i]-aux;
-			indiceMin = i;
+		if (valMin > custoNB[j]-aux) {
+			valMin = custoNB[j]-aux;
+			indiceMin = j;
 		}
 	}
 
@@ -65,24 +92,14 @@ int **defineB(int m, int n, int **A, int **custoB, int *custo) {
 int **defineNaoB(int m, int n, int **A, int **custoNB, int *custo) {
 	int **naoBasica = alocaMatriz(m, n-m);
 
-	for (int i=0; i<m; i++)
+	for (int i=0; i<m; i++) {
 		for (int j=0; j<n-m; j++){
 			naoBasica[i][j] = A[i][j];
 			(*custoNB)[j] = custo[j];
 		}
-
-	return naoBasica;
-}
-
-// Essa funcao le os valores de um vetor da entrada padrao
-int *lerVetor(int tam){
-	int *vet = alocaVetor(tam);
-
-	for (int i=0; i<tam; i++) {
-		scanf("%d", &vet[i]);
 	}
 
-	return vet;
+	return naoBasica;
 }
 
 
@@ -111,8 +128,6 @@ int main(){
 	int *xb;		// vetor de solucao basica
 	int *lambda;	// vetor multiplicador simplex
 	int *cRelativo;	// custos relativos
-	int i;			// variavel temporaria para criacao dos vetores
-	int j;			// variavel temporaria para criacao dos vetores
 	
 	//Numero de linhas e colunas 
 	printf("Digite o numero de linhas e colunas.\n");
@@ -127,26 +142,24 @@ int main(){
 	b = lerVetor(m);
 	
 	//matriz de coeficientes
-	A = (int**)malloc(n * sizeof(int));
 	printf("Digite a matriz de coeficientes de restricao.\n");
-	for (i=0; i<m; i++){
-		printf("Linha %d\n", i+1);
-		A[i] = lerVetor(n);
-	}
+	A = lerMatriz(m, n);
+
 	//preenche o vetor custoBasico e custoNaoBasico
-	cb = (int)calloc (0, m*sizeof(int));
-	cn = (int)calloc (0, (n-m)*sizeof(int));
+	cb = alocaVetor(m);
+	cn = alocaVetor(n-m);
+
 	//preenchendo a matriz basica e nao basica
 	B = defineB(m,n,A,&cb,c);
 	N = defineNaoB(m,n,A,&cn,c);
 	
 
-	while(true){
-		int indEntraBase;
+	//loop de iteracoes do simplex
+	while(true) {
 		//calcula Xb
 		xb = resolveSistema(m,B,b);
 		lambda = resolveSistema(m,B,c);
-		indEntraBase = pegaIndiceEntraNaBase(cn, lambda, N, m, n);
+		int indEntraBase = pegaIndiceEntraNaBase(cn, lambda, N, m, n);
 		if (indEntraBase == -1)
 			break;
 		break;
