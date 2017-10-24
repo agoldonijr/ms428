@@ -157,18 +157,45 @@ void reportaOtimo(int tam, double *pontoOtimo, double valorOtimo) {
 
 //////// TODO!!!!
 
+
+gsl_matrix *gsl_matrix_clone(int size, double ** matrix) {
+	gsl_matrix* m = gsl_matrix_alloc(size, size);
+
+	for (int i=0; i<size; i++) {
+		for (int j=0; j<size; j++) {
+			gsl_matrix_set(m, i, j, matrix[i][j]);
+		}
+	}
+
+	return m;
+}
+
+gsl_vector *gsl_vector_clone(int size, double *vector) {
+	gsl_vector *v = gsl_vector_alloc(size);
+
+	for (int i=0; i<size; i++) {
+		gsl_vector_set(v,i,vector[i]);
+	}
+
+	return v;
+}
+
 //resolver sistema B * Xb =  b
 double *resolveSistema(int tam, double **matriz, double *vetor) {
 
-	gsl_matrix_view m = gsl_matrix_view_array (matriz, tam, tam);
-	gsl_vector_view b = gsl_vector_view_array (vetor, tam);
+	gsl_matrix *m = gsl_matrix_clone(tam, matriz);
+
+	gsl_vector *v = gsl_vector_clone(tam, vetor);
+
+	// gsl_matrix_view m = gsl_matrix_view_array (matriz, tam, tam);
+	// gsl_vector_view b = gsl_vector_view_array (vetor, tam);
 	gsl_vector *x = gsl_vector_alloc (tam);
 	
 	int s;
 
 	gsl_permutation * p = gsl_permutation_alloc (tam);
-	gsl_linalg_LU_decomp (&m.matrix, p, &s);
-	gsl_linalg_LU_solve (&m.matrix, p, &b.vector, x);
+	gsl_linalg_LU_decomp (m, p, &s);
+	gsl_linalg_LU_solve (m, p, v, x);
 
 	printf ("x = \n");
 	gsl_vector_fprintf (stdout, x, "%g");
