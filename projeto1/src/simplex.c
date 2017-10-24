@@ -131,6 +131,7 @@ int **defineB(int m, int n, int **A, int **custoB, int *custo) {
 
 	return basica;
 }
+
 //Definicao das matrizes Nao-Basica
 int **defineNaoB(int m, int n, int **A, int **custoNB, int *custo) {
 	int **naoBasica = alocaMatriz(m, n-m);
@@ -145,15 +146,25 @@ int **defineNaoB(int m, int n, int **A, int **custoNB, int *custo) {
 	return naoBasica;
 }
 
+void reportaOtimo(int tam, int *pontoOtimo, int valorOtimo) {
+	printf("Ponto otimo encontrado:\n");
+	printf("x` = ");
+	printaVetor(tam, pontoOtimo);
+
+	printf("f(x) = %d\n", valorOtimo);
+}
 
 //////// TODO!!!!
 
 //resolver sistema Xb = (B^-1) b
-int *resolveSistema(int tam, int **matriz, int *vetor){
+int *resolveSistema(int tam, int **matriz, int *vetor) {
 	int *xb;
 	return xb;
 }
 
+int *resolveSistemaTransposta(int tam, int **matriz, int *vetor) {
+	return 0;
+}
 
 
 // Funcao principal
@@ -202,11 +213,16 @@ int main(){
 	//loop de iteracoes do simplex
 	while(true) {
 		//calcula Xb
-		xb = resolveSistema(m,B,b);
-		lambda = resolveSistema(m,B,c);
-		int indEntraBase = pegaIndiceEntraNaBase(cn, lambda, N, m, n);
-		if (indEntraBase == -1)
-			break;
+		// xb = resolveSistema(m,B,b);
+
+		// lambda = resolveSistemaTransposta(m,B,c);
+
+		// int indEntraBase = pegaIndiceEntraNaBase(cn, lambda, N, m, n);
+		// if (indEntraBase == -1) {
+		// 	//TODO chamar funcao mas passando as coisas certas
+		// 	//reportaOtimo(m, xb, fxb)
+		// 	return 0;
+		// }
 		break;
 	}
 
