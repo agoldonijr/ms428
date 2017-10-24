@@ -1,4 +1,4 @@
-#Trabalho de MS428 - Implementação do Simplex
+##Trabalho de MS428 - Implementação do Simplex
 
 Para compilar use o script bash compile.bash
 

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <stdbool.h>
-#include <gsl/gsl_sf_bessel.h>
+#include <gsl/gsl_linalg.h>
 
 /////// utils
 
@@ -40,7 +40,7 @@ int **lerMatriz(int lin, int col) {
 		for (int j=0; j<col; j++) {
 			scanf("%d", &matriz[i][j]);
 
-			//printf("just read %d  at i=%d, j=%d, addr %d\n", matriz[i][j], i, j, &matriz[i][j]);
+			//printf("just read %d	at i=%d, j=%d, addr %d\n", matriz[i][j], i, j, &matriz[i][j]);
 		}
 	}
 
@@ -157,10 +157,26 @@ void reportaOtimo(int tam, int *pontoOtimo, int valorOtimo) {
 
 //////// TODO!!!!
 
-//resolver sistema Xb = (B^-1) b
-int *resolveSistema(int tam, int **matriz, int *vetor) {
-	int *xb;
-	return xb;
+//resolver sistema B * Xb =  b
+double *resolveSistema(int tam, double **matriz, double *vetor) {
+
+	gsl_matrix_view m = gsl_matrix_view_array (matriz, tam, tam);
+	gsl_vector_view b = gsl_vector_view_array (vetor, tam);
+	gsl_vector *x = gsl_vector_alloc (tam);
+	
+	int s;
+
+	gsl_permutation * p = gsl_permutation_alloc (tam);
+	gsl_linalg_LU_decomp (&m.matrix, p, &s);
+	gsl_linalg_LU_solve (&m.matrix, p, &b.vector, x);
+
+	printf ("x = \n");
+	gsl_vector_fprintf (stdout, x, "%g");
+
+	gsl_permutation_free (p);
+	// gsl_vector_free (x);
+	// return 0;
+	return x->data; // I'm sorry... :(
 }
 
 int *resolveSistemaTransposta(int tam, int **matriz, int *vetor) {
