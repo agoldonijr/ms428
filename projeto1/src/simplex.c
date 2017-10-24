@@ -3,9 +3,25 @@
 #include <limits.h>
 #include <stdbool.h>
 
+/////// utils
+
 int *alocaVetor(int tam) {
 	return (int*) calloc(0, tam * sizeof(int));
 }
+
+int **alocaMatriz(int lin, int col) {
+	int **matriz = (int**) malloc(lin * sizeof(int*));
+
+	for (int i=0; i<lin; i++) {
+		matriz[i] = (int) calloc(0, col * sizeof(int));
+	}
+
+	return matriz;
+}
+
+///////
+
+
 
 //calcula custo relativo
 int pegaIndiceEntraNaBase(int *custoNB, int *lambda, int **N, int m, int n) {
@@ -25,7 +41,7 @@ int pegaIndiceEntraNaBase(int *custoNB, int *lambda, int **N, int m, int n) {
 		}
 	}
 
-	if(valMin > 0) {
+	if (valMin > 0) {
 		return -1;
 	} else {
 		return indiceMin;
@@ -33,26 +49,23 @@ int pegaIndiceEntraNaBase(int *custoNB, int *lambda, int **N, int m, int n) {
 }
 
 //Definicao das matrizes Basica e do custo das matrizes basicas
-int **defineB(int m, int n, int **A, int **custoB, int *custo){
+int **defineB(int m, int n, int **A, int **custoB, int *custo) {
 	int **basica;
-	int i;
-	int j;
-
 
 	//Alocando a matriz B
-	basica = (int*)malloc(m *sizeof (int));
-	for (i=0; i<m; i++)
-		basica[i] = (int) calloc(0, m*sizeof(int));
-	for (i=0; i<m; i++)
-		for (j=0; j<m; j++) {
+	basica = alocaMatriz(m, m);
+
+	for (int i=0; i<m; i++) {
+		for (int j=0; j<m; j++) {
 			basica[i][j] = A[i][n-m+j];
 			(*custoB)[j] = custo[n-m+j]; 
 		}
+	}
 
 	return basica;
 }
 //Definicao das matrizes Nao-Basica
-int **defineNaoB(int m, int n, int **A, int **custoNB, int *custo){
+int **defineNaoB(int m, int n, int **A, int **custoNB, int *custo) {
 	int **Naobasica;
 	int i;
 	int j;
