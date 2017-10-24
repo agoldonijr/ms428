@@ -50,10 +50,7 @@ int pegaIndiceEntraNaBase(int *custoNB, int *lambda, int **N, int m, int n) {
 
 //Definicao das matrizes Basica e do custo das matrizes basicas
 int **defineB(int m, int n, int **A, int **custoB, int *custo) {
-	int **basica;
-
-	//Alocando a matriz B
-	basica = alocaMatriz(m, m);
+	int **basica = alocaMatriz(m, m);
 
 	for (int i=0; i<m; i++) {
 		for (int j=0; j<m; j++) {
@@ -66,10 +63,7 @@ int **defineB(int m, int n, int **A, int **custoB, int *custo) {
 }
 //Definicao das matrizes Nao-Basica
 int **defineNaoB(int m, int n, int **A, int **custoNB, int *custo) {
-	int **naoBasica;
-
-	//Alocando a matriz B
-	naoBasica = alocaMatriz(m, n-m);
+	int **naoBasica = alocaMatriz(m, n-m);
 
 	for (int i=0; i<m; i++)
 		for (int j=0; j<n-m; j++){
