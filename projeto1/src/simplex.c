@@ -180,6 +180,16 @@ gsl_vector *gsl_vector_clone(int size, double *vector) {
 	return v;
 }
 
+double *clone_back(gsl_vector *vector) {
+	double *arr = alocaVetor(vector->size);
+
+	for (int i=0; i < vector->size; i++) {
+		arr[i] = gsl_vector_get(vector, i);
+	}
+
+	return arr;
+}
+
 //resolver sistema B * Xb =  b
 double *resolveSistema(int tam, double **matriz, double *vetor) {
 
