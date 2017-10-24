@@ -3,38 +3,33 @@
 #include <limits.h>
 #include <stdbool.h>
 
-//multiplicacao de matriz por vetor
-int **multiplicaMatrizPorVetor(int **matriz, int *vetor, int tam) {
-	int *mult;
-
-	mult = (int) calloc(0, sizeof(int));
-	puts("validar");
-	for (int i=0; i<tam; i++)
-		for (int j=0; j<tam; j++)
-			mult = matriz[i][j] * vetor[i];
-	return mult;
+int *alocaVetor(int tam) {
+	return (int*) calloc(0, tam * sizeof(int));
 }
 
 //calcula custo relativo
 int pegaIndiceEntraNaBase(int *custoNB, int *lambda, int **N, int m, int n) {
-	int i;
-	int j;
 	int indiceMin = 0;
 	int valMin = INT_MAX;
 	
-	for (i=0; i<n-m; i++){
+	for (int i=0; i<n-m; i++) {
 		int aux =0;
-		for (j=0; j<m; j++)
+
+		for (int j=0; j<m; j++) {
 			aux += lambda[i] *N[j][i];
-		if (valMin > custoNB[i]-aux){
+		}
+
+		if (valMin > custoNB[i]-aux) {
 			valMin = custoNB[i]-aux;
 			indiceMin = i;
 		}
 	}
-	if(valMin > 0)
+
+	if(valMin > 0) {
 		return -1;
-	else
+	} else {
 		return indiceMin;
+	}
 }
 
 //Definicao das matrizes Basica e do custo das matrizes basicas
