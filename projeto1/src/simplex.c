@@ -66,32 +66,27 @@ int **defineB(int m, int n, int **A, int **custoB, int *custo) {
 }
 //Definicao das matrizes Nao-Basica
 int **defineNaoB(int m, int n, int **A, int **custoNB, int *custo) {
-	int **Naobasica;
-	int i;
-	int j;
+	int **naoBasica;
 
 	//Alocando a matriz B
-	Naobasica = (int*)malloc(m *sizeof (int));
-	for (i=0; i<m; i++)
-		Naobasica[i] = (int) calloc(0, (n-m)*sizeof(int));
+	naoBasica = alocaMatriz(m, n-m);
 
-	for (i=0; i<m; i++)
-		for (j=0; j<n-m; j++){
-			Naobasica[i][j] = A[i][j];
+	for (int i=0; i<m; i++)
+		for (int j=0; j<n-m; j++){
+			naoBasica[i][j] = A[i][j];
 			(*custoNB)[j] = custo[j];
 		}
 
-	return Naobasica;
+	return naoBasica;
 }
 
-// Essa funcao faz o preenchimento de vetores de forma dinamica
-int *preencheVetor(int tam){
-	int i;
-	int *vet;
+// Essa funcao le os valores de um vetor da entrada padrao
+int *lerVetor(int tam){
+	int *vet = alocaVetor(tam);
 
-	vet = (int*) malloc(tam * sizeof(int));
-	for (i=0; i<tam; i++)
+	for (int i=0; i<tam; i++) {
 		scanf("%d", &vet[i]);
+	}
 
 	return vet;
 }
@@ -131,18 +126,18 @@ int main(){
 	
 	//vetor de custos
 	printf("Digite o vetor de custos.\n");
-	c = preencheVetor(n);
+	c = lerVetor(n);
 	
 	//vetor de recursos
 	printf("Digite o vetor de recursos.\n");
-	b = preencheVetor(m);
+	b = lerVetor(m);
 	
 	//matriz de coeficientes
 	A = (int**)malloc(n * sizeof(int));
 	printf("Digite a matriz de coeficientes de restricao.\n");
 	for (i=0; i<m; i++){
 		printf("Linha %d\n", i+1);
-		A[i] = preencheVetor(n);
+		A[i] = lerVetor(n);
 	}
 	//preenche o vetor custoBasico e custoNaoBasico
 	cb = (int)calloc (0, m*sizeof(int));
