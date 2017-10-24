@@ -12,3 +12,5 @@ Aqui temos um exemplo de como usa-lá para resolver um SL: https://www.gnu.org/s
 Para instalar a lib no mac eu rodei: `brew install gsl`
 
 
+
+```./compile.bash && ./simplexExec < teste1.in```
