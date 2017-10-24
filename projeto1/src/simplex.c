@@ -1,17 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
+#include <float.h>
 #include <stdbool.h>
 #include <gsl/gsl_linalg.h>
 
 /////// utils
 
-int *alocaVetor(int tam) {
-	return (int*) calloc(tam, sizeof(int));
+double *alocaVetor(int tam) {
+	return (double*) calloc(tam, sizeof(double));
 }
 
-int **alocaMatriz(int lin, int col) {
-	int **matriz = (int**) malloc(lin * sizeof(int *));
+double **alocaMatriz(int lin, int col) {
+	double **matriz = (double**) malloc(lin * sizeof(double *));
 
 	for (int i=0; i<lin; i++) {
 		matriz[i] = alocaVetor(col);
@@ -21,24 +21,24 @@ int **alocaMatriz(int lin, int col) {
 }
 
 // Essa funcao le os valores de um vetor da entrada padrao
-int *lerVetor(int tam){
-	int *vet = alocaVetor(tam);
+double *lerVetor(int tam){
+	double *vet = alocaVetor(tam);
 
 	for (int i=0; i<tam; i++) {
-		scanf("%d", &vet[i]);
+		scanf("%lf", &vet[i]);
 	}
 
 	return vet;
 }
 
-int **lerMatriz(int lin, int col) {
-	int** matriz = alocaMatriz(lin, col);
+double **lerMatriz(int lin, int col) {
+	double** matriz = alocaMatriz(lin, col);
 
 	for (int i=0; i<lin; i++) {
 		printf("Digite a linha %d:\n", i+1);
 
 		for (int j=0; j<col; j++) {
-			scanf("%d", &matriz[i][j]);
+			scanf("%lf", &matriz[i][j]);
 
 			//printf("just read %d	at i=%d, j=%d, addr %d\n", matriz[i][j], i, j, &matriz[i][j]);
 		}
@@ -47,11 +47,11 @@ int **lerMatriz(int lin, int col) {
 	return matriz;
 }
 
-void printaMatriz(int lin, int col, int **matriz) {
+void printaMatriz(int lin, int col, double **matriz) {
 	for(int i=0; i<lin; i++) {
 
 		for(int j=0; j<col; j++) {
-			printf("%d ", matriz[i][j]);
+			printf("%lf ", matriz[i][j]);
 		}
 
 		printf("\n");
@@ -59,14 +59,14 @@ void printaMatriz(int lin, int col, int **matriz) {
 	printf("\n");
 }
 
-void printaVetor(int tam, int *vetor) {
+void printaVetor(int tam, double *vetor) {
 	for (int i=0; i<tam; i++) {
-		printf("%d ", vetor[i]);
+		printf("%lf ", vetor[i]);
 	}
 	printf("\n\n");
 }
 
-void printState(int m, int n, int **A, int **B, int **N, int *c, int *cb, int *cn) {
+void printState(int m, int n, double **A, double **B, double **N, double *c, double *cb, double *cn) {
 	//printState(m, n, A, B, N, c, cb, cn);
 
 	printf("A\n");
@@ -93,17 +93,17 @@ void printState(int m, int n, int **A, int **B, int **N, int *c, int *cb, int *c
 
 
 //calcula custo relativo
-int pegaIndiceEntraNaBase(int *custoNB, int *lambda, int **N, int m, int n) {
+int pegaIndiceEntraNaBase(double *custoNB, double *lambda, double **N, int m, int n) {
 	int indiceMin = 0;
-	int valMin = INT_MAX;
+	double valMin = DBL_MAX;
 	
 	//para cada coluna
 	for (int j=0; j<n-m; j++) {
-		int aux =0;
+		double aux=0;
 
 		//calcula o custo relativo
 		for (int i=0; i<m; i++) {
-			aux += lambda[j] *N[i][j];
+			aux += lambda[j] * N[i][j];
 		}
 
 		if (valMin > custoNB[j]-aux) {
@@ -120,8 +120,8 @@ int pegaIndiceEntraNaBase(int *custoNB, int *lambda, int **N, int m, int n) {
 }
 
 //Definicao das matrizes Basica e do custo das matrizes basicas
-int **defineB(int m, int n, int **A, int **custoB, int *custo) {
-	int **basica = alocaMatriz(m, m);
+double **defineB(int m, int n, double **A, double **custoB, double *custo) {
+	double **basica = alocaMatriz(m, m);
 
 	for (int i=0; i<m; i++) {
 		for (int j=0; j<m; j++) {
@@ -134,8 +134,8 @@ int **defineB(int m, int n, int **A, int **custoB, int *custo) {
 }
 
 //Definicao das matrizes Nao-Basica
-int **defineNaoB(int m, int n, int **A, int **custoNB, int *custo) {
-	int **naoBasica = alocaMatriz(m, n-m);
+double **defineNaoB(int m, int n, double **A, double **custoNB, double *custo) {
+	double **naoBasica = alocaMatriz(m, n-m);
 
 	for (int i=0; i<m; i++) {
 		for (int j=0; j<n-m; j++){
@@ -147,12 +147,12 @@ int **defineNaoB(int m, int n, int **A, int **custoNB, int *custo) {
 	return naoBasica;
 }
 
-void reportaOtimo(int tam, int *pontoOtimo, int valorOtimo) {
+void reportaOtimo(int tam, double *pontoOtimo, double valorOtimo) {
 	printf("Ponto otimo encontrado:\n");
 	printf("x` = ");
 	printaVetor(tam, pontoOtimo);
 
-	printf("f(x) = %d\n", valorOtimo);
+	printf("f(x) = %lf\n", valorOtimo);
 }
 
 //////// TODO!!!!
@@ -186,18 +186,18 @@ int *resolveSistemaTransposta(int tam, int **matriz, int *vetor) {
 // Funcao principal
 int main(){
 
-	int m;			// numero de linhas
-	int n;			// numero de colunas
-	int *c; 		// vetor de custos
-	int *b; 		// vetor de recursos
-	int **A;		// matriz de coeficientes
-	int **B;		// matriz basica 
-	int **N;		// matriz nao basica 
-	int *cb;		// custo basico
-	int *cn;		// custo nao basico
-	int *xb;		// vetor de solucao basica
-	int *lambda;	// vetor multiplicador simplex
-	int *cRelativo;	// custos relativos
+	int m;				// numero de linhas
+	int n;				// numero de colunas
+	double *c; 			// vetor de custos
+	double *b; 			// vetor de recursos
+	double **A;			// matriz de coeficientes
+	double **B;			// matriz basica 
+	double **N;			// matriz nao basica 
+	double *cb;			// custo basico
+	double *cn;			// custo nao basico
+	double *xb;			// vetor de solucao basica
+	double *lambda;		// vetor multiplicador simplex
+	double *cRelativo;	// custos relativos
 	
 	//Numero de linhas e colunas 
 	printf("Digite o numero de linhas e colunas.\n");
@@ -231,7 +231,9 @@ int main(){
 	//loop de iteracoes do simplex
 	while(true) {
 		//calcula Xb
-		// xb = resolveSistema(m,B,b);
+		xb = resolveSistema(m,B,b);
+
+		printaVetor(m, xb);
 
 		// lambda = resolveSistemaTransposta(m,B,c);
 
