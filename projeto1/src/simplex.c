@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <stdbool.h>
+#include <gsl/gsl_sf_bessel.h>
 
 /////// utils
 
@@ -166,7 +167,6 @@ int *resolveSistemaTransposta(int tam, int **matriz, int *vetor) {
 	return 0;
 }
 
-
 // Funcao principal
 int main(){
 
@@ -209,6 +209,8 @@ int main(){
 	
 
 	printState(m, n, A, B, N, c, cb, cn);
+
+
 
 	//loop de iteracoes do simplex
 	while(true) {
