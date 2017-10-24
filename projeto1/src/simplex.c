@@ -47,6 +47,20 @@ double **lerMatriz(int lin, int col) {
 	return matriz;
 }
 
+// troca a posicao indA do vetor A com a posicao indB do vetor B
+void trocaIndice(double *A, double *B, int indA, int indB) {
+	double aux = A[indA];
+	A[indA] = B[indB];
+	B[indB] = aux;
+}
+
+// troca a coluna colA da matriz A com a coluna colB da matriz B
+void trocaColuna(int qtdLinhas, double **A, double **B, int colA, int colB) {
+	for (int i=0; i<qtdLinhas; i++) {
+		trocaIndice(A[i], B[i], colA, colB);
+	}
+}
+
 void printaMatriz(int lin, int col, double **matriz) {
 	for(int i=0; i<lin; i++) {
 
@@ -126,6 +140,16 @@ gsl_vector *gslVectorClone(int size, double *vector) {
 	return v;
 }
 
+gsl_vector *gslCloneMatrixColumnAsVector(int size, double **sourceMatrix, int colIndex) {
+	gsl_vector *v = gsl_vector_alloc(size);
+
+	for (int i=0; i<size; i++) {
+		gsl_vector_set(v, i, sourceMatrix[i][colIndex]);
+	}
+
+	return v;	
+}
+
 double *gslCloneBack(gsl_vector *vector) {
 	double *arr = alocaVetor(vector->size);
 
@@ -166,7 +190,8 @@ double *resolveSistemaGSL(int tam, gsl_matrix *m, gsl_vector *v) {
 
 
 
-//calcula custo relativo
+// calcula os custos relativos e retorna o indice do menor custo negativo
+// se todos os custos relativos forem >= 0 entao retorna -1 indicando condição de otimalidade
 int pegaIndiceEntraNaBase(double *custoNB, double *lambda, double **N, int m, int n) {
 	int indiceMin = 0;
 	double valMin = DBL_MAX;
@@ -186,7 +211,7 @@ int pegaIndiceEntraNaBase(double *custoNB, double *lambda, double **N, int m, in
 		}
 	}
 
-	if (valMin > 0) {
+	if (valMin >= 0) {
 		return -1;
 	} else {
 		return indiceMin;
@@ -229,8 +254,6 @@ void reportaOtimo(int tam, double *pontoOtimo, double valorOtimo) {
 	printf("f(x) = %lf\n", valorOtimo);
 }
 
-//////// TODO!!!!
-
 
 //resolver sistema B * Xb =  b
 double *resolveSistema(int tam, double **matriz, double *vetor) {
@@ -247,6 +270,27 @@ double *resolveSistemaTransposta(int tam, double **matriz, double *vetor) {
 	return resolveSistemaGSL(tam, m, v);
 }
 
+double *resolveSistemaUsandoColunaDaMatrizComoVetor(int tam, double **matriz, double **matrizOrigemDoVetor, int colunaDoVetor) {
+	gsl_matrix *m = gslMatrixClone(tam, matriz);
+	gsl_vector *v = gslCloneMatrixColumnAsVector(tam, matrizOrigemDoVetor, colunaDoVetor);
+
+	return resolveSistemaGSL(tam, m, v);
+}
+
+int pegaIndiceSaiDaBase(int tam, double *y, double *xb) {
+	double min = DBL_MAX;
+	int minIndex = -1;
+
+	for(int i=0; i<tam; i++) {
+		if (y[i] > 0 && xb[i]/y[i] < min) {
+			min = xb[i]/y[i];
+			minIndex = i;
+		}
+	}
+
+	return minIndex;
+}
+
 // Funcao principal
 int main(){
 
@@ -261,8 +305,8 @@ int main(){
 	double *cn;			// custo nao basico
 	double *xb;			// vetor de solucao basica
 	double *lambda;		// vetor multiplicador simplex
-	double *cRelativo;	// custos relativos
-	
+	double *y;			// direcao simplex
+
 	//Numero de linhas e colunas 
 	printf("Digite o numero de linhas e colunas.\n");
 	scanf("%d %d", &m, &n);
@@ -286,32 +330,74 @@ int main(){
 	//preenchendo a matriz basica e nao basica
 	B = defineB(m,n,A,&cb,c);
 	N = defineNaoB(m,n,A,&cn,c);
-	
-
-	printState(m, n, A, B, N, c, cb, cn);
 
 
 
 	//loop de iteracoes do simplex
-	while(true) {
+	for (int iteracao = 0; iteracao<1000; iteracao++) {
+		printf("ITERACAO %d \n\n", iteracao);
+		printState(m, n, A, B, N, c, cb, cn);
+
+		// PASSO 1: {cálculo da solução básica}
 		//calcula Xb
 		xb = resolveSistema(m,B,b);
+		//SET ME FREE!!
 
 		printf("Xb: \n");
 		printaVetor(m, xb);
 
-		printf("lambda: \n");
-		lambda = resolveSistemaTransposta(m,B,c);
 
+		// PASSO 2: {cálculo dos custos relativos} 
+		// calcula vetor multiplicador simplex
+		lambda = resolveSistemaTransposta(m,B,c);
+		//SET ME FREE!!
+
+		printf("lambda: \n");
 		printaVetor(m, lambda);
 
+		//calcula custos relativos e pega indice do menor custo relativo
 		int indEntraBase = pegaIndiceEntraNaBase(cn, lambda, N, m, n);
+
+		// PASSO 3: {teste de otimalidade}
+		// quando retorna -1 quer dizer que todos os custos relativos eram >= 0
+		// portanto este ponto é o otimizador da funcao
 		if (indEntraBase == -1) {
 			//TODO chamar funcao mas passando as coisas certas
 			//reportaOtimo(m, xb, fxb)
 			return 0;
 		}
-		break;
+
+		// PASSO 4: {cálculo da direção simplex}
+		// calculo da direcao simplex
+		y = resolveSistemaUsandoColunaDaMatrizComoVetor(m, B, N, indEntraBase);
+
+		printf("y: \n");
+		printaVetor(m, y);
+
+
+		// PASSO 5: {determinação do passo e variável a sair da base}
+
+		// Se y ≤ 0,então: PARE=VERDADE {problema não tem solução ótima finita}.
+		int temSolucaoFinita = 0;
+		for (int i=0; i<m; i++) {
+			if (y[i] > 0) {
+				temSolucaoFinita = 1;
+				break;
+			}
+		}
+
+		if (!temSolucaoFinita) {
+			printf ("Problema nao tem solucao finita!!\n");
+			return 0;
+		}
+
+		// determina a variavel a sair da base
+		int indSaiDaBase = pegaIndiceSaiDaBase(m, y, xb);
+
+
+		// PASSO 6: {atualização: nova partição básica, troque a l-ésima coluna de B pela k-ésima coluna de N}.
+		trocaColuna(m, B, N, indSaiDaBase, indEntraBase);
+		trocaIndice(cb, cn, indSaiDaBase, indEntraBase);
 	}
 
 	return 0;	
