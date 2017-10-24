@@ -6,14 +6,14 @@
 /////// utils
 
 int *alocaVetor(int tam) {
-	return (int*) calloc(0, tam * sizeof(int));
+	return (int*) calloc(tam, sizeof(int));
 }
 
 int **alocaMatriz(int lin, int col) {
-	int **matriz = (int**) malloc(lin * sizeof(int*));
+	int **matriz = (int**) malloc(lin * sizeof(int *));
 
 	for (int i=0; i<lin; i++) {
-		matriz[i] = (int*) calloc(0, col * sizeof(int));
+		matriz[i] = alocaVetor(col);
 	}
 
 	return matriz;
@@ -33,15 +33,58 @@ int *lerVetor(int tam){
 int **lerMatriz(int lin, int col) {
 	int** matriz = alocaMatriz(lin, col);
 
-	for (int i=0; i < lin; i++) {
+	for (int i=0; i<lin; i++) {
 		printf("Digite a linha %d:\n", i+1);
 
-		for (int j=0; j < col; j++) {
+		for (int j=0; j<col; j++) {
 			scanf("%d", &matriz[i][j]);
+
+			//printf("just read %d  at i=%d, j=%d, addr %d\n", matriz[i][j], i, j, &matriz[i][j]);
 		}
 	}
 
 	return matriz;
+}
+
+void printaMatriz(int lin, int col, int **matriz) {
+	for(int i=0; i<lin; i++) {
+
+		for(int j=0; j<col; j++) {
+			printf("%d ", matriz[i][j]);
+		}
+
+		printf("\n");
+	}
+	printf("\n");
+}
+
+void printaVetor(int tam, int *vetor) {
+	for (int i=0; i<tam; i++) {
+		printf("%d ", vetor[i]);
+	}
+	printf("\n\n");
+}
+
+void printState(int m, int n, int **A, int **B, int **N, int *c, int *cb, int *cn) {
+	//printState(m, n, A, B, N, c, cb, cn);
+
+	printf("A\n");
+	printaMatriz(m,n,A);
+
+	printf("B\n");
+	printaMatriz(m,m,B);
+
+	printf("N\n");
+	printaMatriz(m,n-m,N);
+
+	printf("c\n");
+	printaVetor(n, c);
+
+	printf("cb\n");
+	printaVetor(m, cb);
+
+	printf("cn\n");
+	printaVetor(n-m, cn);
 }
 
 ///////
@@ -153,6 +196,8 @@ int main(){
 	B = defineB(m,n,A,&cb,c);
 	N = defineNaoB(m,n,A,&cn,c);
 	
+
+	printState(m, n, A, B, N, c, cb, cn);
 
 	//loop de iteracoes do simplex
 	while(true) {
