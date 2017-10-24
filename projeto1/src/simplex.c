@@ -4,27 +4,19 @@
 #include <stdbool.h>
 
 //multiplicacao de matriz por vetor
-int **multiplicaMatrix(int **matriz, int *vetor, int tam){
-	int i;
-	int j;
+int **multiplicaMatrizPorVetor(int **matriz, int *vetor, int tam) {
 	int *mult;
 
 	mult = (int) calloc(0, sizeof(int));
 	puts("validar");
-	for (i=0; i<tam; i++)
-		for (j=0; j<tam; j++)
+	for (int i=0; i<tam; i++)
+		for (int j=0; j<tam; j++)
 			mult = matriz[i][j] * vetor[i];
 	return mult;
 }
 
-//resolver sistema Xb = (B^-1) b
-int *resolveSistema(int tam, int **matriz, int *vetor){
-	int *xb;
-	return xb;
-}
-
 //calcula custo relativo
-int entraNaBase(int *custoNB, int *lambda, int **N, int m, int n){
+int pegaIndiceEntraNaBase(int *custoNB, int *lambda, int **N, int m, int n) {
 	int i;
 	int j;
 	int indiceMin = 0;
@@ -96,6 +88,17 @@ int *preencheVetor(int tam){
 	return vet;
 }
 
+
+//////// TODO!!!!
+
+//resolver sistema Xb = (B^-1) b
+int *resolveSistema(int tam, int **matriz, int *vetor){
+	int *xb;
+	return xb;
+}
+
+
+
 // Funcao principal
 int main(){
 
@@ -146,7 +149,7 @@ int main(){
 		//calcula Xb
 		xb = resolveSistema(m,B,b);
 		lambda = resolveSistema(m,B,c);
-		indEntraBase = entraNaBase(cn, lambda, N, m, n);
+		indEntraBase = pegaIndiceEntraNaBase(cn, lambda, N, m, n);
 		if (indEntraBase == -1)
 			break;
 		break;
