@@ -4,7 +4,7 @@ Para compilar use o script bash compile.bash
 
 
 ## Resolução de sistemas lineares
-Para resolver sistemas lineares estamos usando a lib GSL.
+Para resolver sistemas lineares estamos usando a lib GSL(http://www.gnu.org/software/gsl/).
 
 Aqui temos um exemplo de como usa-lá para resolver um SL: https://www.gnu.org/software/gsl/manual/html_node/Linear-Algebra-Examples.html#Linear-Algebra-Examples
 
