@@ -90,6 +90,80 @@ void printState(int m, int n, double **A, double **B, double **N, double *c, dou
 
 ///////
 
+/////// gsl utils
+
+gsl_matrix *gslMatrixClone(int size, double ** matrix) {
+	gsl_matrix* m = gsl_matrix_alloc(size, size);
+
+	for (int i=0; i<size; i++) {
+		for (int j=0; j<size; j++) {
+			gsl_matrix_set(m, i, j, matrix[i][j]);
+		}
+	}
+
+	return m;
+}
+
+gsl_matrix *gslMatrixTransposeClone(int size, double ** matrix) {
+	gsl_matrix* m = gsl_matrix_alloc(size, size);
+
+	for (int i=0; i<size; i++) {
+		for (int j=0; j<size; j++) {
+			gsl_matrix_set(m, i, j, matrix[j][i]);
+		}
+	}
+
+	return m;
+}
+
+gsl_vector *gslVectorClone(int size, double *vector) {
+	gsl_vector *v = gsl_vector_alloc(size);
+
+	for (int i=0; i<size; i++) {
+		gsl_vector_set(v,i,vector[i]);
+	}
+
+	return v;
+}
+
+double *gslCloneBack(gsl_vector *vector) {
+	double *arr = alocaVetor(vector->size);
+
+	for (int i=0; i < vector->size; i++) {
+		arr[i] = gsl_vector_get(vector, i);
+	}
+
+	return arr;
+}
+
+
+double *resolveSistemaGSL(int tam, gsl_matrix *m, gsl_vector *v) {
+	// gsl_matrix_view m = gsl_matrix_view_array (matriz, tam, tam);
+	// gsl_vector_view b = gsl_vector_view_array (vetor, tam);
+	gsl_vector *x = gsl_vector_alloc (tam);
+	
+	int s;
+
+	gsl_permutation * p = gsl_permutation_alloc (tam);
+	gsl_linalg_LU_decomp (m, p, &s);
+	gsl_linalg_LU_solve (m, p, v, x);
+
+	gsl_permutation_free (p);
+
+	gsl_matrix_free(m);
+	gsl_vector_free(v);
+
+	double *solucaoSL = gslCloneBack(x);
+
+	// printf ("x = \n");
+	// gsl_vector_fprintf (stdout, x, "%g");
+	gsl_vector_free(x);
+
+	return solucaoSL;
+}
+
+//////////
+
 
 
 //calcula custo relativo
@@ -158,66 +232,19 @@ void reportaOtimo(int tam, double *pontoOtimo, double valorOtimo) {
 //////// TODO!!!!
 
 
-gsl_matrix *gsl_matrix_clone(int size, double ** matrix) {
-	gsl_matrix* m = gsl_matrix_alloc(size, size);
-
-	for (int i=0; i<size; i++) {
-		for (int j=0; j<size; j++) {
-			gsl_matrix_set(m, i, j, matrix[i][j]);
-		}
-	}
-
-	return m;
-}
-
-gsl_vector *gsl_vector_clone(int size, double *vector) {
-	gsl_vector *v = gsl_vector_alloc(size);
-
-	for (int i=0; i<size; i++) {
-		gsl_vector_set(v,i,vector[i]);
-	}
-
-	return v;
-}
-
-double *clone_back(gsl_vector *vector) {
-	double *arr = alocaVetor(vector->size);
-
-	for (int i=0; i < vector->size; i++) {
-		arr[i] = gsl_vector_get(vector, i);
-	}
-
-	return arr;
-}
-
 //resolver sistema B * Xb =  b
 double *resolveSistema(int tam, double **matriz, double *vetor) {
+	gsl_matrix *m = gslMatrixClone(tam, matriz);
+	gsl_vector *v = gslVectorClone(tam, vetor);
 
-	gsl_matrix *m = gsl_matrix_clone(tam, matriz);
-
-	gsl_vector *v = gsl_vector_clone(tam, vetor);
-
-	// gsl_matrix_view m = gsl_matrix_view_array (matriz, tam, tam);
-	// gsl_vector_view b = gsl_vector_view_array (vetor, tam);
-	gsl_vector *x = gsl_vector_alloc (tam);
-	
-	int s;
-
-	gsl_permutation * p = gsl_permutation_alloc (tam);
-	gsl_linalg_LU_decomp (m, p, &s);
-	gsl_linalg_LU_solve (m, p, v, x);
-
-	printf ("x = \n");
-	gsl_vector_fprintf (stdout, x, "%g");
-
-	gsl_permutation_free (p);
-	// gsl_vector_free (x);
-	// return 0;
-	return x->data; // I'm sorry... :(
+	return resolveSistemaGSL(tam, m, v);
 }
 
-int *resolveSistemaTransposta(int tam, int **matriz, int *vetor) {
-	return 0;
+double *resolveSistemaTransposta(int tam, double **matriz, double *vetor) {
+	gsl_matrix *m = gslMatrixTransposeClone(tam, matriz);
+	gsl_vector *v = gslVectorClone(tam, vetor);
+
+	return resolveSistemaGSL(tam, m, v);
 }
 
 // Funcao principal
@@ -270,16 +297,20 @@ int main(){
 		//calcula Xb
 		xb = resolveSistema(m,B,b);
 
+		printf("Xb: \n");
 		printaVetor(m, xb);
 
-		// lambda = resolveSistemaTransposta(m,B,c);
+		printf("lambda: \n");
+		lambda = resolveSistemaTransposta(m,B,c);
 
-		// int indEntraBase = pegaIndiceEntraNaBase(cn, lambda, N, m, n);
-		// if (indEntraBase == -1) {
-		// 	//TODO chamar funcao mas passando as coisas certas
-		// 	//reportaOtimo(m, xb, fxb)
-		// 	return 0;
-		// }
+		printaVetor(m, lambda);
+
+		int indEntraBase = pegaIndiceEntraNaBase(cn, lambda, N, m, n);
+		if (indEntraBase == -1) {
+			//TODO chamar funcao mas passando as coisas certas
+			//reportaOtimo(m, xb, fxb)
+			return 0;
+		}
 		break;
 	}
 
