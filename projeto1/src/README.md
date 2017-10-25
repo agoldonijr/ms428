@@ -15,3 +15,4 @@ Para instalar a lib no MacOS: `brew install gsl`
 Para instalar a lib no Debian/Ubuntu: apt-get install libgsl-dev liblapack-dev
 
 ```./compile.bash && ./simplexExec < teste1.in```
+
