@@ -310,7 +310,7 @@ int pegaIndiceSaiDaBase(int tam, double *y, double *xb) {
 void adicionaBigM(double *custos, double **A, int lin, int col) {
 	for (int k=col; k<col+lin; k++) {
 		A[k-col][k] = 1;
-		custos[k] = 999;//DBL_MAX/2;
+		custos[k] = 1000000000000000000;
 	}
 }
 
