@@ -159,18 +159,14 @@ gsl_vector *gslCloneMatrixColumnAsVector(int size, double **sourceMatrix, int co
 	return v;	
 }
 
-double *gslCloneBack(gsl_vector *vector) {
-	double *arr = alocaVetor(vector->size);
-
+void gslCloneBack(gsl_vector *vector, double *destino) {
 	for (int i=0; i < vector->size; i++) {
-		arr[i] = gsl_vector_get(vector, i);
+		destino[i] = gsl_vector_get(vector, i);
 	}
-
-	return arr;
 }
 
 
-double *resolveSistemaGSL(int tam, gsl_matrix *m, gsl_vector *v) {
+void resolveSistemaGSL(int tam, gsl_matrix *m, gsl_vector *v, double *solucaoSL) {
 	// gsl_matrix_view m = gsl_matrix_view_array (matriz, tam, tam);
 	// gsl_vector_view b = gsl_vector_view_array (vetor, tam);
 	gsl_vector *x = gsl_vector_alloc (tam);
@@ -186,13 +182,11 @@ double *resolveSistemaGSL(int tam, gsl_matrix *m, gsl_vector *v) {
 	gsl_matrix_free(m);
 	gsl_vector_free(v);
 
-	double *solucaoSL = gslCloneBack(x);
+	gslCloneBack(x, solucaoSL);
 
 	// printf ("x = \n");
 	// gsl_vector_fprintf (stdout, x, "%g");
 	gsl_vector_free(x);
-
-	return solucaoSL;
 }
 
 //////////
@@ -272,25 +266,25 @@ void reportaOtimo(int tam, double *pontoOtimo, double valorOtimo) {
 
 
 //resolver sistema B * Xb =  b
-double *resolveSistema(int tam, double **matriz, double *vetor) {
+void resolveSistema(int tam, double **matriz, double *vetor, double *solucaoSL) {
 	gsl_matrix *m = gslMatrixClone(tam, matriz);
 	gsl_vector *v = gslVectorClone(tam, vetor);
 
-	return resolveSistemaGSL(tam, m, v);
+	resolveSistemaGSL(tam, m, v, solucaoSL);
 }
 
-double *resolveSistemaTransposta(int tam, double **matriz, double *vetor) {
+void resolveSistemaTransposta(int tam, double **matriz, double *vetor, double *solucaoSL) {
 	gsl_matrix *m = gslMatrixTransposeClone(tam, matriz);
 	gsl_vector *v = gslVectorClone(tam, vetor);
 
-	return resolveSistemaGSL(tam, m, v);
+	return resolveSistemaGSL(tam, m, v, solucaoSL);
 }
 
-double *resolveSistemaUsandoColunaDaMatrizComoVetor(int tam, double **matriz, double **matrizOrigemDoVetor, int colunaDoVetor) {
+void resolveSistemaUsandoColunaDaMatrizComoVetor(int tam, double **matriz, double **matrizOrigemDoVetor, int colunaDoVetor, double *solucaoSL) {
 	gsl_matrix *m = gslMatrixClone(tam, matriz);
 	gsl_vector *v = gslCloneMatrixColumnAsVector(tam, matrizOrigemDoVetor, colunaDoVetor);
 
-	return resolveSistemaGSL(tam, m, v);
+	return resolveSistemaGSL(tam, m, v, solucaoSL);
 }
 
 int pegaIndiceSaiDaBase(int tam, double *y, double *xb) {
@@ -376,6 +370,9 @@ int main(){
 	N = defineNaoB(m,n,A,&cn,c);
 
 
+	xb = alocaVetor(m);
+	lambda = alocaVetor(m);
+	y = alocaVetor(m);
 	//loop de iteracoes do simplex
 	for (int iteracao = 0; iteracao<1000; iteracao++) {
 		printf("ITERACAO %d \n\n", iteracao);
@@ -383,17 +380,15 @@ int main(){
 
 		// PASSO 1: {cálculo da solução básica}
 		//calcula Xb
-		xb = resolveSistema(m,B,b);
-		//SET ME FREE!!
+		resolveSistema(m, B, b, xb);
 
 		printf("Xb: \n");
 		printaVetor(m, xb);
 
 
 		// PASSO 2: {cálculo dos custos relativos} 
-		// calcula vetor multiplicador simplex
-		lambda = resolveSistemaTransposta(m,B,cb);
-		//SET ME FREE!!
+		// calcula vetor multiplicador simplex (lambda)
+		resolveSistemaTransposta(m, B, cb, lambda);
 
 		printf("lambda: \n");
 		printaVetor(m, lambda);
@@ -429,7 +424,7 @@ int main(){
 
 		// PASSO 4: {cálculo da direção simplex}
 		// calculo da direcao simplex
-		y = resolveSistemaUsandoColunaDaMatrizComoVetor(m, B, N, indEntraBase);
+		resolveSistemaUsandoColunaDaMatrizComoVetor(m, B, N, indEntraBase, y);
 
 		printf("y: \n");
 		printaVetor(m, y);
@@ -437,12 +432,26 @@ int main(){
 
 		// PASSO 5: {determinação do passo e variável a sair da base}
 		// Se y ≤ 0,então: PARE=VERDADE {problema não tem solução ótima finita}.
+		int temSolucaoFinita = 0;
 		for (int i=0; i<m; i++) {
-			if (y[i] <= 0) {
-				printf ("\n\nProblema nao tem solucao finita!!!\n\n");
-				return 0;
+			if (y[i] > 0) {
+				temSolucaoFinita = 1;
+				break;
 			}
 		}
+
+		if (!temSolucaoFinita) {
+			printf ("Problema nao tem solucao finita!!\n");
+			return 0;
+		}
+
+		// se for qualquer Yi <= 0
+		// for (int i=0; i<m; i++) {
+		// 	if (y[i] <= 0) {
+		// 		printf ("\n\nProblema nao tem solucao finita!!!\n\n");
+		// 		return 0;
+		// 	}
+		// }
 
 		// determina a variavel a sair da base
 		int indSaiDaBase = pegaIndiceSaiDaBase(m, y, xb);
