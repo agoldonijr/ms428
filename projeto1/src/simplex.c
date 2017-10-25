@@ -31,9 +31,7 @@ double *lerVetor(int tam){
 	return vet;
 }
 
-double **lerMatriz(int lin, int col) {
-	double** matriz = alocaMatriz(lin, col);
-
+double **lerMatriz(int lin, int col, double **matriz) {
 	for (int i=0; i<lin; i++) {
 		printf("Digite a linha %d:\n", i+1);
 
@@ -328,7 +326,8 @@ int main(){
 	
 	//matriz de coeficientes
 	printf("Digite a matriz de coeficientes de restricao.\n");
-	A = lerMatriz(m, n);
+	double** matriz = alocaMatriz(m, n);
+	A = lerMatriz(m, n, matriz);
 
 	//preenche o vetor custoBasico e custoNaoBasico
 	cb = alocaVetor(m);
