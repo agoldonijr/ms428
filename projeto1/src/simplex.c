@@ -196,20 +196,27 @@ int pegaIndiceEntraNaBase(double *custoNB, double *lambda, double **N, int m, in
 	int indiceMin = 0;
 	double valMin = DBL_MAX;
 	
+	printf("custos relativos:\n");
+
 	//para cada coluna
 	for (int j=0; j<n-m; j++) {
-		double aux=0;
+		double lambdaEscalarNj=0;
 
 		//calcula o custo relativo
 		for (int i=0; i<m; i++) {
-			aux += lambda[j] * N[i][j];
+			lambdaEscalarNj += lambda[i] * N[i][j];
 		}
 
-		if (valMin > custoNB[j]-aux) {
-			valMin = custoNB[j]-aux;
+		double custoRelativo = custoNB[j]-lambdaEscalarNj;
+		printf("%lf ", custoRelativo);
+
+		if (valMin > custoRelativo) {
+			valMin = custoRelativo;
 			indiceMin = j;
 		}
 	}
+
+	printf ("\n\n");
 
 	if (valMin >= 0) {
 		return -1;
@@ -349,7 +356,7 @@ int main(){
 
 		// PASSO 2: {cálculo dos custos relativos} 
 		// calcula vetor multiplicador simplex
-		lambda = resolveSistemaTransposta(m,B,c);
+		lambda = resolveSistemaTransposta(m,B,cb);
 		//SET ME FREE!!
 
 		printf("lambda: \n");
@@ -363,7 +370,8 @@ int main(){
 		// portanto este ponto é o otimizador da funcao
 		if (indEntraBase == -1) {
 			//TODO chamar funcao mas passando as coisas certas
-			//reportaOtimo(m, xb, fxb)
+			double fxb = 1337;
+			reportaOtimo(m, xb, fxb);
 			return 0;
 		}
 
