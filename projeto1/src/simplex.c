@@ -21,9 +21,7 @@ double **alocaMatriz(int lin, int col) {
 }
 
 // Essa funcao le os valores de um vetor da entrada padrao
-double *lerVetor(int tam){
-	double *vet = alocaVetor(tam);
-
+double *lerVetor(int tam, double *vet) {
 	for (int i=0; i<tam; i++) {
 		scanf("%lf", &vet[i]);
 	}
@@ -296,6 +294,13 @@ int pegaIndiceSaiDaBase(int tam, double *y, double *xb) {
 	return minIndex;
 }
 
+void adicionaBigM(double *custos, double **A, int lin, int col) {
+	for (int k=col; k<col+lin; k++) {
+		A[k-col][k] = 1;
+		custos[k] = DBL_MAX/2;
+	}
+}
+
 // Funcao principal
 int main(){
 
@@ -312,22 +317,33 @@ int main(){
 	double *lambda;		// vetor multiplicador simplex
 	double *y;			// direcao simplex
 
+	printf("\nEste programa resolve problemas de otimizacao na forma padrao usando o algoritimo primal simplex.\n");
+	printf("Siga as instrucoes abaixo para inserir os dados do problema na forma padrao.\n\n");
+
 	//Numero de linhas e colunas 
-	printf("Digite o numero de linhas e colunas.\n");
+	printf("Digite o numero de linhas e colunas da matriz de restricoes.\n");
 	scanf("%d %d", &m, &n);
 	
 	//vetor de custos
-	printf("Digite o vetor de custos.\n");
-	c = lerVetor(n);
+	c = alocaVetor(n+m);
+	printf("Digite os coeficientes da funcao de custo a ser minimizada (na ordem x1 x2 x3 ... xn).\n");
+	lerVetor(n, c);
 	
 	//vetor de recursos
-	printf("Digite o vetor de recursos.\n");
-	b = lerVetor(m);
+	b = alocaVetor(m);
+	printf("Digite os valores das restricoes (Ax = b, digite o b).\n");
+	lerVetor(m, b);
 	
 	//matriz de coeficientes
-	printf("Digite a matriz de coeficientes de restricao.\n");
-	double** matriz = alocaMatriz(m, n);
+	double** matriz = alocaMatriz(m, n+m);
+	printf("Digite a matriz de coeficientes de restricao (Ax = b, digite a matriz A).\n");
 	A = lerMatriz(m, n, matriz);
+
+
+	// a partir desse momento o programa considera o problema com BigM
+	adicionaBigM(c, A, m, n);
+	n = n+m;
+
 
 	//preenche o vetor custoBasico e custoNaoBasico
 	cb = alocaVetor(m);
