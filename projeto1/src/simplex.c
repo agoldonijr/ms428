@@ -50,6 +50,12 @@ void trocaIndice(double *A, double *B, int indA, int indB) {
 	B[indB] = aux;
 }
 
+void trocaIndiceInt(int *A, int *B, int indA, int indB) {
+	int aux = A[indA];
+	A[indA] = B[indB];
+	B[indB] = aux;
+}
+
 // troca a coluna colA da matriz A com a coluna colB da matriz B
 void trocaColuna(int qtdLinhas, double **A, double **B, int colA, int colB) {
 	for (int i=0; i<qtdLinhas; i++) {
@@ -72,6 +78,13 @@ void printaMatriz(int lin, int col, double **matriz) {
 void printaVetor(int tam, double *vetor) {
 	for (int i=0; i<tam; i++) {
 		printf("%lf ", vetor[i]);
+	}
+	printf("\n\n");
+}
+
+void printaVetorInt(int tam, int *vetor) {
+	for (int i=0; i<tam; i++) {
+		printf("%d ", vetor[i]);
 	}
 	printf("\n\n");
 }
@@ -297,7 +310,7 @@ int pegaIndiceSaiDaBase(int tam, double *y, double *xb) {
 void adicionaBigM(double *custos, double **A, int lin, int col) {
 	for (int k=col; k<col+lin; k++) {
 		A[k-col][k] = 1;
-		custos[k] = DBL_MAX/2;
+		custos[k] = 999;//DBL_MAX/2;
 	}
 }
 
@@ -316,6 +329,10 @@ int main(){
 	double *xb;			// vetor de solucao basica
 	double *lambda;		// vetor multiplicador simplex
 	double *y;			// direcao simplex
+
+	int *indicesBaseENaoBase; // vetor para dizer quais variaveis sao basicas e quais sao nao basicas
+	// as priemiras m posicoes do vetor representam os indices relativos a matriz A das colunas de N
+	// as ultimas n-m posicoes do vetor representam os indices relativos a matriz A das colunas de B
 
 	printf("\nEste programa resolve problemas de otimizacao na forma padrao usando o algoritimo primal simplex.\n");
 	printf("Siga as instrucoes abaixo para inserir os dados do problema na forma padrao.\n\n");
@@ -344,6 +361,11 @@ int main(){
 	adicionaBigM(c, A, m, n);
 	n = n+m;
 
+	indicesBaseENaoBase = (int*) calloc(n, sizeof(int));
+	for (int i=0; i<n; i++) {
+		indicesBaseENaoBase[i] = i;
+	}
+
 
 	//preenche o vetor custoBasico e custoNaoBasico
 	cb = alocaVetor(m);
@@ -352,7 +374,6 @@ int main(){
 	//preenchendo a matriz basica e nao basica
 	B = defineB(m,n,A,&cb,c);
 	N = defineNaoB(m,n,A,&cn,c);
-
 
 
 	//loop de iteracoes do simplex
@@ -384,9 +405,17 @@ int main(){
 		// quando retorna -1 quer dizer que todos os custos relativos eram >= 0
 		// portanto este ponto é o otimizador da funcao
 		if (indEntraBase == -1) {
-			//TODO chamar funcao mas passando as coisas certas
-			double fxb = 1337;
-			reportaOtimo(m, xb, fxb);
+			double fxb = 0;
+			for (int i=0; i<m; i++) {
+				fxb += cb[i] * xb[i];
+			}
+
+			double *xOtimo = alocaVetor(n);
+			for (int i=n-m; i<n; i++) {
+				xOtimo[indicesBaseENaoBase[i]] = xb[i-n+m];
+			}
+
+			reportaOtimo(n-m, xOtimo, fxb);
 			return 0;
 		}
 
@@ -421,6 +450,11 @@ int main(){
 		// PASSO 6: {atualização: nova partição básica, troque a l-ésima coluna de B pela k-ésima coluna de N}.
 		trocaColuna(m, B, N, indSaiDaBase, indEntraBase);
 		trocaIndice(cb, cn, indSaiDaBase, indEntraBase);
+
+		// printf("antes e dps troca de indice\n");
+		// printaVetorInt(n, indicesBaseENaoBase);
+		trocaIndiceInt(indicesBaseENaoBase, indicesBaseENaoBase, n-m+indSaiDaBase, indEntraBase);
+		// printaVetorInt(n, indicesBaseENaoBase);
 	}
 
 	return 0;	
