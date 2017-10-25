@@ -275,7 +275,11 @@ double **defineNaoB(int m, int n, double **A, double **custoNB, double *custo) {
 void reportaOtimo(int tam, double *pontoOtimo, double valorOtimo) {
 	printf("Ponto otimo encontrado:\n");
 	printf("x` = ");
-	printaVetor(tam, pontoOtimo);
+
+	for (int i=0; i<tam; i++) {
+		printf("%lf ", pontoOtimo[i]);
+	}
+	printf("\n\n");
 
 	printf("f(x) = %lf\n", valorOtimo);
 }
