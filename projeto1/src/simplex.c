@@ -418,7 +418,7 @@ int main(){
 			// detecta infactibilidade se alguma variavel artificial for diferente de zero na solucao
 			for (int i=n-m; i<n; i++) {
 				if (xOtimo[i] != 0) {
-					printf("Problema infactivel! Ainda existem variaveis artificiais diferentes de zero na solucao encontrada com BigM");
+					printf("\n\nProblema infactivel!!!\nAinda existem variaveis artificiais diferentes de zero na solucao encontrada com BigM\n\n");
 					return 0;
 				}
 			}
@@ -436,19 +436,12 @@ int main(){
 
 
 		// PASSO 5: {determinação do passo e variável a sair da base}
-
 		// Se y ≤ 0,então: PARE=VERDADE {problema não tem solução ótima finita}.
-		int temSolucaoFinita = 0;
 		for (int i=0; i<m; i++) {
-			if (y[i] > 0) {
-				temSolucaoFinita = 1;
-				break;
+			if (y[i] <= 0) {
+				printf ("\n\nProblema nao tem solucao finita!!!\n\n");
+				return 0;
 			}
-		}
-
-		if (!temSolucaoFinita) {
-			printf ("Problema nao tem solucao finita!!\n");
-			return 0;
 		}
 
 		// determina a variavel a sair da base
