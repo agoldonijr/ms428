@@ -415,7 +415,7 @@ int main(){
 				xOtimo[indicesBaseENaoBase[i]] = xb[i-n+m];
 			}
 
-			// detecta infactibilidade se alguma variavel artificial for diferente de zero
+			// detecta infactibilidade se alguma variavel artificial for diferente de zero na solucao
 			for (int i=n-m; i<n; i++) {
 				if (xOtimo[i] != 0) {
 					printf("Problema infactivel! Ainda existem variaveis artificiais diferentes de zero na solucao encontrada com BigM");
