@@ -1,10 +1,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <float.h>
-#include <stdbool.h>
+#include <stdarg.h>
 #include <gsl/gsl_linalg.h>
 
 /////// utils
+
+int DEBUGGING = 0;
+
+void DEBUG_NO_ARG(const char *string) {
+	if (DEBUGGING) {
+		printf("%s", string);
+	}
+}
+
+void DEBUG(const char *string, int n, ...) {
+	if (DEBUGGING) {
+		va_list ap;
+		va_start(ap, n);
+		vprintf(string, ap);
+	}
+}
 
 double *alocaVetor(int tam) {
 	return (double*) calloc(tam, sizeof(double));
@@ -67,47 +83,47 @@ void printaMatriz(int lin, int col, double **matriz) {
 	for(int i=0; i<lin; i++) {
 
 		for(int j=0; j<col; j++) {
-			printf("%lf ", matriz[i][j]);
+			DEBUG("%lf ", 1, matriz[i][j]);
 		}
 
-		printf("\n");
+		DEBUG_NO_ARG("\n");
 	}
-	printf("\n");
+	DEBUG_NO_ARG("\n");
 }
 
 void printaVetor(int tam, double *vetor) {
 	for (int i=0; i<tam; i++) {
-		printf("%lf ", vetor[i]);
+		DEBUG("%lf ", 1, vetor[i]);
 	}
-	printf("\n\n");
+	DEBUG_NO_ARG("\n\n");
 }
 
 void printaVetorInt(int tam, int *vetor) {
 	for (int i=0; i<tam; i++) {
-		printf("%d ", vetor[i]);
+		DEBUG("%d ", 1, vetor[i]);
 	}
-	printf("\n\n");
+	DEBUG_NO_ARG("\n\n");
 }
 
 void printState(int m, int n, double **A, double **B, double **N, double *c, double *cb, double *cn) {
 	//printState(m, n, A, B, N, c, cb, cn);
 
-	printf("A\n");
+	DEBUG_NO_ARG("A\n");
 	printaMatriz(m,n,A);
 
-	printf("B\n");
+	DEBUG_NO_ARG("B\n");
 	printaMatriz(m,m,B);
 
-	printf("N\n");
+	DEBUG_NO_ARG("N\n");
 	printaMatriz(m,n-m,N);
 
-	printf("c\n");
+	DEBUG_NO_ARG("c\n");
 	printaVetor(n, c);
 
-	printf("cb\n");
+	DEBUG_NO_ARG("cb\n");
 	printaVetor(m, cb);
 
-	printf("cn\n");
+	DEBUG_NO_ARG("cn\n");
 	printaVetor(n-m, cn);
 }
 
@@ -199,7 +215,7 @@ int pegaIndiceEntraNaBase(double *custoNB, double *lambda, double **N, int m, in
 	int indiceMin = 0;
 	double valMin = DBL_MAX;
 	
-	printf("custos relativos:\n");
+	DEBUG_NO_ARG("custos relativos:\n");
 
 	//para cada coluna
 	for (int j=0; j<n-m; j++) {
@@ -211,7 +227,7 @@ int pegaIndiceEntraNaBase(double *custoNB, double *lambda, double **N, int m, in
 		}
 
 		double custoRelativo = custoNB[j]-lambdaEscalarNj;
-		printf("%lf ", custoRelativo);
+		DEBUG("%lf ", 1, custoRelativo);
 
 		if (valMin > custoRelativo) {
 			valMin = custoRelativo;
@@ -219,7 +235,7 @@ int pegaIndiceEntraNaBase(double *custoNB, double *lambda, double **N, int m, in
 		}
 	}
 
-	printf ("\n\n");
+	DEBUG_NO_ARG ("\n\n");
 
 	if (valMin >= 0) {
 		return -1;
@@ -375,14 +391,14 @@ int main(){
 	y = alocaVetor(m);
 	//loop de iteracoes do simplex
 	for (int iteracao = 0; iteracao<1000; iteracao++) {
-		printf("ITERACAO %d \n\n", iteracao);
+		DEBUG("ITERACAO %d \n\n", 1, iteracao);
 		printState(m, n, A, B, N, c, cb, cn);
 
 		// PASSO 1: {cálculo da solução básica}
 		//calcula Xb
 		resolveSistema(m, B, b, xb);
 
-		printf("Xb: \n");
+		DEBUG_NO_ARG("Xb: \n");
 		printaVetor(m, xb);
 
 
@@ -390,7 +406,7 @@ int main(){
 		// calcula vetor multiplicador simplex (lambda)
 		resolveSistemaTransposta(m, B, cb, lambda);
 
-		printf("lambda: \n");
+		DEBUG_NO_ARG("lambda: \n");
 		printaVetor(m, lambda);
 
 		//calcula custos relativos e pega indice do menor custo relativo
@@ -426,7 +442,7 @@ int main(){
 		// calculo da direcao simplex
 		resolveSistemaUsandoColunaDaMatrizComoVetor(m, B, N, indEntraBase, y);
 
-		printf("y: \n");
+		DEBUG_NO_ARG("y: \n");
 		printaVetor(m, y);
 
 
