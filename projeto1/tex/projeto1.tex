@@ -13,13 +13,14 @@
 	}%Fechando Title
 \begin{document}
 \maketitle
-%-----------------------------------------------------------------
+%--------------------------------------------------------------------------------------------------
 %Seções
-%-----------------------------------------------------------------
+%--------------------------------------------------------------------------------------------------
 \section{Introdu\c{c}\~ao}
 O m\'etodo simplex \'e uma ferramenta utilizada para melhorar a solu\c{c}\~ao da fun\c{c}\~ao objetivo de um problema de otimiza\c{c}\~ao linear. O m\'etodo tenta melhorar o valor da solu\c{c}\~ao a cada passo de intera\c{c}\~ao at\'e que se tenha a solu\c{c}\~ao \'otima.\\
 Esse m\'etodo viabiliza a solu\c{c}\~ao de muitos problemas de programa\c{c}\~ao linear e \'e muito popular.\\
 Ele permite que se encontre valores ideais em situa\c{c}\~oes em que condi\c{c}\~oes necessitam ser respeitadas.\\
+%--------------------------------------------------------------------------------------------------
 \section{Funcionamento}
 Para o funcionamento da biblioteca simplex desenvolvida \'e preciso ter as bibliotecas gsl (GNU Scientific Library) instalada. Essa biblioteca ajuda na resolu\c{c}\~ao dos sistemas lineares presentes no algor\'itmo do Simplex.\\
 Para a instala\c{c}\~ao Linux (Debian Like):
@@ -62,7 +63,25 @@ Para a execu\c{c}\~ao:
 \begin{lstlisting}[language=bash]
   # ./simplexExec < teste.in
 \end{lstlisting}
-
-\section{Testes}
+Caso n\~ao queira editar o arquivo, pode-se digitar as entradas baseadas na perguntas que o pr\'oprio programa pede. Neste caso, para a execu\c{c}\~ao do programa fica da seguinte forma:
+\\
+\begin{lstlisting}[language=bash]
+  # ./simplexExec 
+\end{lstlisting}
+A imagem a seguir, ilustra a execu\c{c}\~ao e as entradas para o programa:
+\begin{figure}[h]
+\caption{Exemplo para entradas do Simplex}
+\includegraphics[width=0.95\textwidth]{simplexEntradas.png}
+\end{figure}
+\\
+Como sa\'ida, o programa retorna:
+\begin{itemize}
+\item Caso encontre a solu\c{c}\~ao, o programa retorna o ponto encontrado e o valor da fun\c{c}\~ao,
+\item Caso o problema n\~ao encontre solu\c{c}\~ao fact\'ivel, o programa retorna a seguinte frase: "Problema infactivel!!! Ainda existem variaveis artificiais diferentes de zero na solucao encontrada com BigM"
+\\
+\item Caso o problema tenha infin\'itas solu\c{c}\~oes, o programa retorna a seguinte frase: "Problema nao tem solucao finita!!"
+\end{itemize}
+%--------------------------------------------------------------------------------------------------
+\section{Discus\~ao}
 \section{Conclus\~ao}
 \end{document} 
