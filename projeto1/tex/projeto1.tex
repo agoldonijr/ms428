@@ -82,6 +82,51 @@ Como sa\'ida, o programa retorna:
 \item Caso o problema tenha infin\'itas solu\c{c}\~oes, o programa retorna a seguinte frase: "Problema nao tem solucao finita!!"
 \end{itemize}
 %--------------------------------------------------------------------------------------------------
-\section{Discus\~ao}
+\section{Testes}
+As poss\'iveis solu\c{c}\~ao para o Simplex s\~ao: Fact\'ivel, infact\'ivel e ilimitado. Utilizamos os seguintes testes para cada uma das solu\c{c}\~ao:
+\begin{itemize}
+\item Fact\'ivel:
+\\
+O seguinte exemplo possui solu\c{c}\~ao fact\'ivel:
+\\
+Linhas: 2
+\\
+Colunas: 4
+\\
+Fun\c{c}\~ao: -$x_1$ - 3$x_2$ + 0$x_3$ + 0$x_4$
+\\
+Vetor b = [6 3]
+\\
+Matriz de restri\c{c}\~ao:\\
+1 1 1 0\\
+0 1 0 1\\
+A sa\'ida do programa ser\'a a seguinte:
+\begin{figure}[h]
+\caption{Exemplo Simplex: Problema fac\'itvel}
+\includegraphics[width=0.95\textwidth]{factivel.png}
+\end{figure}
+\\
+\item Infact\'ivel
+\\
+O seguinte exemplo possui solu\c{c}\~ao infact\'ivel:
+\\
+Linhas: 2
+\\
+Colunas: 4
+\\
+Fun\c{c}\~ao: 2$x_1$ + 2$x_2$ + 0$x_3$ + 0$x_4$
+\\
+Vetor b = [1 -1]
+\\
+Matriz de restri\c{c}\~ao:\\
+-1 1 -1 0\\
+1 1 0 1\\
+A sa\'ida do programa ser\'a a seguinte:
+\begin{figure}[h]
+\caption{Exemplo Simplex: Problema fac\'itvel}
+\includegraphics[width=0.95\textwidth]{infactivel.png}
+\end{figure}
+
+\end{itemize}
 \section{Conclus\~ao}
 \end{document} 
